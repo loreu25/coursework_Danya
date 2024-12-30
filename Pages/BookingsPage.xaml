@@ -1,0 +1,39 @@
+<Page x:Class="TicketBookingSystem.Pages.BookingsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Управление бронированиями">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+            <Button x:Name="btnAddBooking" Content="Новое бронирование" Width="150" Margin="0,0,10,0" Click="btnAddBooking_Click"/>
+            <Button x:Name="btnCancelBooking" Content="Отменить бронирование" Width="150" Margin="0,0,10,0" Click="btnCancelBooking_Click"/>
+            <ComboBox x:Name="cmbStatusFilter" Width="150" Margin="0,0,10,0" SelectionChanged="cmbStatusFilter_SelectionChanged">
+                <ComboBoxItem Content="Все бронирования"/>
+                <ComboBoxItem Content="Активные"/>
+                <ComboBoxItem Content="Отмененные"/>
+            </ComboBox>
+        </StackPanel>
+
+        <DataGrid x:Name="bookingsGrid" 
+                  Grid.Row="1" 
+                  AutoGenerateColumns="False" 
+                  IsReadOnly="True"
+                  SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Номер рейса" Binding="{Binding Flight.FlightNumber}"/>
+                <DataGridTextColumn Header="Пассажир" Binding="{Binding PassengerName}"/>
+                <DataGridTextColumn Header="Контакт" Binding="{Binding PassengerContact}"/>
+                <DataGridTextColumn Header="Откуда" Binding="{Binding Flight.DepartureCity}"/>
+                <DataGridTextColumn Header="Куда" Binding="{Binding Flight.ArrivalCity}"/>
+                <DataGridTextColumn Header="Отправление" Binding="{Binding Flight.DepartureTime}"/>
+                <DataGridTextColumn Header="Количество мест" Binding="{Binding NumberOfSeats}"/>
+                <DataGridTextColumn Header="Общая стоимость" Binding="{Binding TotalPrice}"/>
+                <DataGridTextColumn Header="Статус" Binding="{Binding Status}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Page>

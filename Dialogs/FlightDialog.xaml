@@ -1,0 +1,68 @@
+<Window x:Class="TicketBookingSystem.Dialogs.FlightDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Информация о рейсе" 
+        Height="500" 
+        Width="400"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Номер рейса -->
+        <Label Grid.Row="0" Grid.Column="0" Content="Номер рейса:" Margin="0,5"/>
+        <TextBox x:Name="txtFlightNumber" Grid.Row="0" Grid.Column="1" Margin="5"/>
+
+        <!-- Город отправления -->
+        <Label Grid.Row="1" Grid.Column="0" Content="Откуда:" Margin="0,5"/>
+        <TextBox x:Name="txtDepartureCity" Grid.Row="1" Grid.Column="1" Margin="5"/>
+
+        <!-- Город прибытия -->
+        <Label Grid.Row="2" Grid.Column="0" Content="Куда:" Margin="0,5"/>
+        <TextBox x:Name="txtArrivalCity" Grid.Row="2" Grid.Column="1" Margin="5"/>
+
+        <!-- Дата и время отправления -->
+        <Label Grid.Row="3" Grid.Column="0" Content="Дата отправления:" Margin="0,5"/>
+        <DatePicker x:Name="dpDepartureDate" Grid.Row="3" Grid.Column="1" Margin="5"/>
+
+        <Label Grid.Row="4" Grid.Column="0" Content="Время отправления:" Margin="0,5"/>
+        <TextBox x:Name="txtDepartureTime" Grid.Row="4" Grid.Column="1" Margin="5"/>
+
+        <!-- Дата и время прибытия -->
+        <Label Grid.Row="5" Grid.Column="0" Content="Дата прибытия:" Margin="0,5"/>
+        <DatePicker x:Name="dpArrivalDate" Grid.Row="5" Grid.Column="1" Margin="5"/>
+
+        <Label Grid.Row="6" Grid.Column="0" Content="Время прибытия:" Margin="0,5"/>
+        <TextBox x:Name="txtArrivalTime" Grid.Row="6" Grid.Column="1" Margin="5"/>
+
+        <!-- Цена билета -->
+        <Label Grid.Row="7" Grid.Column="0" Content="Цена билета:" Margin="0,5"/>
+        <TextBox x:Name="txtTicketPrice" Grid.Row="7" Grid.Column="1" Margin="5"/>
+
+        <!-- Количество мест -->
+        <Label Grid.Row="8" Grid.Column="0" Content="Всего мест:" Margin="0,5"/>
+        <TextBox x:Name="txtTotalSeats" Grid.Row="8" Grid.Column="1" Margin="5"/>
+
+        <!-- Кнопки -->
+        <StackPanel Grid.Row="9" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button x:Name="btnSave" Content="Сохранить" Width="100" Margin="0,0,10,0" Click="btnSave_Click"/>
+            <Button x:Name="btnCancel" Content="Отмена" Width="100" Click="btnCancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

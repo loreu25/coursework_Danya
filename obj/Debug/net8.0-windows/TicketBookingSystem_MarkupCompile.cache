@@ -1,0 +1,20 @@
+﻿TicketBookingSystem
+
+
+winexe
+C#
+.cs
+C:\Users\Никита\Desktop\Лабы\3 семестр\Курсач\qwerty\TicketBookingSystem\obj\Debug\net8.0-windows\
+TicketBookingSystem
+none
+false
+TRACE;DEBUG;NET;NET8_0;NETCOREAPP
+C:\Users\Никита\Desktop\Лабы\3 семестр\Курсач\qwerty\TicketBookingSystem\App.xaml
+5720510590
+
+111323748587
+217-527808221
+Dialogs\BookingDialog.xaml;Dialogs\FlightDialog.xaml;MainWindow.xaml;Pages\BookingsPage.xaml;Pages\FlightsPage.xaml;
+
+False
+

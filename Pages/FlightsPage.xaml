@@ -1,0 +1,33 @@
+<Page x:Class="TicketBookingSystem.Pages.FlightsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Управление рейсами">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+            <Button x:Name="btnAddFlight" Content="Добавить рейс" Width="120" Margin="0,0,10,0" Click="btnAddFlight_Click"/>
+            <Button x:Name="btnEditFlight" Content="Редактировать" Width="120" Margin="0,0,10,0" Click="btnEditFlight_Click"/>
+            <Button x:Name="btnDeleteFlight" Content="Удалить" Width="120" Click="btnDeleteFlight_Click"/>
+        </StackPanel>
+
+        <DataGrid x:Name="flightsGrid" 
+                  Grid.Row="1" 
+                  AutoGenerateColumns="False" 
+                  IsReadOnly="True"
+                  SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Номер рейса" Binding="{Binding FlightNumber}"/>
+                <DataGridTextColumn Header="Откуда" Binding="{Binding DepartureCity}"/>
+                <DataGridTextColumn Header="Куда" Binding="{Binding ArrivalCity}"/>
+                <DataGridTextColumn Header="Отправление" Binding="{Binding DepartureTime}"/>
+                <DataGridTextColumn Header="Прибытие" Binding="{Binding ArrivalTime}"/>
+                <DataGridTextColumn Header="Цена" Binding="{Binding TicketPrice}"/>
+                <DataGridTextColumn Header="Свободно мест" Binding="{Binding AvailableSeats}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Page>
