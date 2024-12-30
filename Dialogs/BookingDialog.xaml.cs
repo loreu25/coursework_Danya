@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using Microsoft.EntityFrameworkCore;
 using TicketBookingSystem.Data;
 using TicketBookingSystem.Models;
@@ -11,110 +10,126 @@ namespace TicketBookingSystem.Dialogs
     public partial class BookingDialog : Window
     {
         private readonly ApplicationDbContext _context;
-        public Booking Booking { get; private set; }
-        private Flight _selectedFlight;
+        private Flight _selectedFlight = null!;
+        public Booking? Booking { get; private set; }
 
         public BookingDialog(ApplicationDbContext context)
         {
             InitializeComponent();
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
             LoadFlights();
         }
 
         private void LoadFlights()
         {
-            var availableFlights = _context.Flights
-                .Where(f => f.AvailableSeats > 0 && f.DepartureTime > DateTime.Now)
-                .OrderBy(f => f.DepartureTime)
-                .ToList();
+            try
+            {
+                var flights = _context.Flights
+                    .Where(f => f.AvailableSeats > 0 && f.DepartureTime > DateTime.Now)
+                    .ToList();
 
-            cmbFlights.ItemsSource = availableFlights;
+                if (!flights.Any())
+                {
+                    MessageBox.Show("Нет доступных рейсов.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                    DialogResult = false;
+                    Close();
+                    return;
+                }
+
+                cmbFlights.ItemsSource = flights;
+                cmbFlights.DisplayMemberPath = "FlightNumber";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при загрузке рейсов: {ex.Message}");
+                DialogResult = false;
+                Close();
+            }
         }
 
         private void UpdateFlightInfo()
         {
             if (_selectedFlight != null)
             {
-                txtFlightInfo.Text = $"Маршрут: {_selectedFlight.DepartureCity} - {_selectedFlight.ArrivalCity}\n" +
-                                   $"Отправление: {_selectedFlight.DepartureTime}\n" +
-                                   $"Прибытие: {_selectedFlight.ArrivalTime}";
-                txtAvailableSeats.Text = $"Доступно мест: {_selectedFlight.AvailableSeats}";
-                txtTicketPrice.Text = $"Цена за место: {_selectedFlight.TicketPrice:C}";
-                
+                txtDepartureCity.Text = _selectedFlight.DepartureCity;
+                txtArrivalCity.Text = _selectedFlight.ArrivalCity;
+                txtDepartureTime.Text = _selectedFlight.DepartureTime.ToString("g");
+                txtArrivalTime.Text = _selectedFlight.ArrivalTime.ToString("g");
+                txtFlightType.Text = _selectedFlight.FlightType;
+                txtBasePrice.Text = _selectedFlight.BasePrice.ToString("C");
+                txtAvailableSeats.Text = _selectedFlight.AvailableSeats.ToString();
+
+                // Обновляем общую стоимость
                 UpdateTotalPrice();
             }
         }
 
-        private void UpdateTotalPrice()
+        private void cmbFlights_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            if (_selectedFlight != null && int.TryParse(txtNumberOfSeats.Text, out int seats))
+            if (cmbFlights.SelectedItem is Flight flight)
             {
-                decimal totalPrice = _selectedFlight.TicketPrice * seats;
-                txtTotalPrice.Text = $"Итого к оплате: {totalPrice:C}";
-            }
-            else
-            {
-                txtTotalPrice.Text = "Итого к оплате: 0 ₽";
+                _selectedFlight = flight;
+                UpdateFlightInfo();
             }
         }
 
-        private void cmbFlights_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            _selectedFlight = cmbFlights.SelectedItem as Flight;
-            UpdateFlightInfo();
-        }
-
-        private void txtNumberOfSeats_TextChanged(object sender, TextChangedEventArgs e)
+        private void txtNumberOfSeats_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
             UpdateTotalPrice();
         }
 
+        private void UpdateTotalPrice()
+        {
+            if (_selectedFlight != null && int.TryParse(txtNumberOfSeats.Text, out int numberOfSeats))
+            {
+                decimal totalPrice = _selectedFlight.CalculatePrice() * numberOfSeats;
+                txtTotalPrice.Text = totalPrice.ToString("C");
+            }
+            else
+            {
+                txtTotalPrice.Text = "0.00";
+            }
+        }
+
         private void btnBook_Click(object sender, RoutedEventArgs e)
         {
-            if (!ValidateInput())
-            {
-                return;
-            }
-
             try
             {
-                int seats = int.Parse(txtNumberOfSeats.Text);
-                decimal totalPrice = _selectedFlight.TicketPrice * seats;
+                if (_selectedFlight == null)
+                {
+                    MessageBox.Show("Пожалуйста, выберите рейс");
+                    return;
+                }
+
+                if (!ValidateInput())
+                    return;
 
                 Booking = new Booking
                 {
-                    FlightId = _selectedFlight.Id,
-                    Flight = _selectedFlight,
                     PassengerName = txtPassengerName.Text,
                     PassengerContact = txtPassengerContact.Text,
-                    NumberOfSeats = seats,
-                    TotalPrice = totalPrice,
                     BookingDate = DateTime.Now,
-                    Status = "Подтверждено"
+                    NumberOfSeats = int.Parse(txtNumberOfSeats.Text),
+                    TotalPrice = _selectedFlight.CalculatePrice() * int.Parse(txtNumberOfSeats.Text),
+                    Status = "Подтверждено",
+                    Flight = _selectedFlight,
+                    FlightId = _selectedFlight.Id
                 };
 
                 DialogResult = true;
+                Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при создании бронирования: {ex.Message}",
-                    "Ошибка",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при создании бронирования: {ex.Message}");
             }
         }
 
         private bool ValidateInput()
         {
-            if (_selectedFlight == null)
-            {
-                ShowError("Выберите рейс");
-                return false;
-            }
-
             if (string.IsNullOrWhiteSpace(txtPassengerName.Text))
             {
-                ShowError("Введите ФИО пассажира");
+                ShowError("Введите имя пассажира");
                 return false;
             }
 
@@ -124,21 +139,16 @@ namespace TicketBookingSystem.Dialogs
                 return false;
             }
 
-            if (!int.TryParse(txtNumberOfSeats.Text, out int seats))
+            int numberOfSeats;
+            if (!int.TryParse(txtNumberOfSeats.Text, out numberOfSeats) || numberOfSeats <= 0)
             {
                 ShowError("Введите корректное количество мест");
                 return false;
             }
 
-            if (seats <= 0)
+            if (numberOfSeats > _selectedFlight.AvailableSeats)
             {
-                ShowError("Количество мест должно быть больше нуля");
-                return false;
-            }
-
-            if (seats > _selectedFlight.AvailableSeats)
-            {
-                ShowError($"Доступно только {_selectedFlight.AvailableSeats} мест");
+                ShowError($"Недостаточно свободных мест. Доступно: {_selectedFlight.AvailableSeats}");
                 return false;
             }
 
@@ -153,6 +163,7 @@ namespace TicketBookingSystem.Dialogs
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
+            Close();
         }
     }
 }
