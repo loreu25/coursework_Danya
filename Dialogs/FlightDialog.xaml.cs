@@ -68,6 +68,10 @@ namespace TicketBookingSystem.Dialogs
 
                     if (needToChangeType)
                     {
+                        // Получаем количество забронированных мест перед созданием нового объекта
+                        int currentBookedSeats = _existingFlight.TotalSeats - _existingFlight.AvailableSeats;
+                        int updatedTotalSeats = int.Parse(txtTotalSeats.Text);
+
                         // Создаем новый объект нужного типа с инициализацией всех обязательных полей
                         Flight = isBusinessFlight
                             ? new BusinessFlight
@@ -76,7 +80,8 @@ namespace TicketBookingSystem.Dialogs
                                 DepartureCity = txtDepartureCity.Text,
                                 ArrivalCity = txtArrivalCity.Text,
                                 FlightType = selectedType,
-                                TotalSeats = int.Parse(txtTotalSeats.Text),
+                                TotalSeats = updatedTotalSeats,
+                                AvailableSeats = updatedTotalSeats - currentBookedSeats,
                                 BasePrice = decimal.Parse(txtBasePrice.Text),
                                 Id = _existingFlight.Id
                             }
@@ -86,7 +91,8 @@ namespace TicketBookingSystem.Dialogs
                                 DepartureCity = txtDepartureCity.Text,
                                 ArrivalCity = txtArrivalCity.Text,
                                 FlightType = selectedType,
-                                TotalSeats = int.Parse(txtTotalSeats.Text),
+                                TotalSeats = updatedTotalSeats,
+                                AvailableSeats = updatedTotalSeats - currentBookedSeats,
                                 BasePrice = decimal.Parse(txtBasePrice.Text),
                                 Id = _existingFlight.Id
                             };
@@ -128,6 +134,7 @@ namespace TicketBookingSystem.Dialogs
                 else
                 {
                     // Создаем новый рейс
+                    int totalSeats = int.Parse(txtTotalSeats.Text);
                     Flight = isBusinessFlight
                         ? new BusinessFlight
                         {
@@ -135,7 +142,8 @@ namespace TicketBookingSystem.Dialogs
                             DepartureCity = txtDepartureCity.Text,
                             ArrivalCity = txtArrivalCity.Text,
                             FlightType = selectedType,
-                            TotalSeats = int.Parse(txtTotalSeats.Text),
+                            TotalSeats = totalSeats,
+                            AvailableSeats = totalSeats,
                             BasePrice = decimal.Parse(txtBasePrice.Text)
                         }
                         : new EconomyFlight
@@ -144,7 +152,8 @@ namespace TicketBookingSystem.Dialogs
                             DepartureCity = txtDepartureCity.Text,
                             ArrivalCity = txtArrivalCity.Text,
                             FlightType = selectedType,
-                            TotalSeats = int.Parse(txtTotalSeats.Text),
+                            TotalSeats = totalSeats,
+                            AvailableSeats = totalSeats,
                             BasePrice = decimal.Parse(txtBasePrice.Text)
                         };
 
@@ -154,7 +163,6 @@ namespace TicketBookingSystem.Dialogs
                     var arrivalDate = dpArrivalDate.SelectedDate!.Value;
                     var arrivalTime = TimeSpan.Parse(txtArrivalTime.Text);
                     Flight.ArrivalTime = arrivalDate.Add(arrivalTime);
-                    Flight.AvailableSeats = Flight.TotalSeats;
                 }
 
                 DialogResult = true;

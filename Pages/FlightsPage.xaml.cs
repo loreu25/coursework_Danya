@@ -24,10 +24,13 @@ namespace TicketBookingSystem.Pages
         {
             try
             {
-                var flights = _context.Flights
-                    .OrderBy(f => f.DepartureTime)
-                    .ToList();
-                dgFlights.ItemsSource = flights;
+                using (var context = new ApplicationDbContext())
+                {
+                    var flights = context.Flights
+                        .OrderBy(f => f.DepartureTime)
+                        .ToList();
+                    dgFlights.ItemsSource = flights;
+                }
             }
             catch (Exception ex)
             {
@@ -88,29 +91,94 @@ namespace TicketBookingSystem.Pages
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
-            var button = (Button)sender;
-            var flight = (Flight)button.DataContext;
-
-            var result = MessageBox.Show("Вы уверены, что хотите удалить этот рейс?",
-                "Подтверждение",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
+            try
             {
-                try
+                Flight flight;
+                
+                if (sender is Button button)
                 {
-                    _context.Flights.Remove(flight);
-                    _context.SaveChanges();
-                    LoadFlights();
+                    if (button.DataContext is Flight f)
+                    {
+                        flight = f;
+                    }
+                    else if (dgFlights.SelectedItem is Flight selectedFlight)
+                    {
+                        flight = selectedFlight;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Выберите рейс для удаления", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show($"Ошибка при удалении рейса: {ex.Message}",
-                        "Ошибка",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
+                    MessageBox.Show("Ошибка при получении данных рейса", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
+
+                if (flight.Id == 0)
+                {
+                    MessageBox.Show("Некорректный ID рейса", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                var result = MessageBox.Show($"Вы уверены, что хотите удалить рейс {flight.FlightNumber}?",
+                    "Подтверждение",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    using (var newContext = new ApplicationDbContext())
+                    {
+                        // Проверяем только активные бронирования
+                        var hasActiveBookings = newContext.Bookings
+                            .AsNoTracking()
+                            .Any(b => b.FlightId == flight.Id && b.Status != "Отменено");
+
+                        if (hasActiveBookings)
+                        {
+                            MessageBox.Show("Невозможно удалить рейс, так как для него существуют активные бронирования.",
+                                "Ошибка",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
+                            return;
+                        }
+
+                        // Получаем актуальный объект рейса из базы данных
+                        var flightToDelete = newContext.Flights.Find(flight.Id);
+                        if (flightToDelete != null)
+                        {
+                            // Удаляем все отмененные бронирования для этого рейса
+                            var cancelledBookings = newContext.Bookings
+                                .Where(b => b.FlightId == flight.Id && b.Status == "Отменено")
+                                .ToList();
+
+                            if (cancelledBookings.Any())
+                            {
+                                newContext.Bookings.RemoveRange(cancelledBookings);
+                            }
+
+                            // Удаляем сам рейс
+                            newContext.Flights.Remove(flightToDelete);
+                            newContext.SaveChanges();
+                            LoadFlights();
+                            MessageBox.Show("Рейс успешно удален", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Рейс не найден в базе данных", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при удалении рейса: {ex.Message}",
+                    "Ошибка",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
     }
