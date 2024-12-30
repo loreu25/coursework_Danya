@@ -3203,11 +3203,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\Никита\\Desktop\\Лабы\\3 семестр\\Курсач\\qwerty\\coursework_danya\\TicketBookingSystem.csproj",
+      "projectUniqueName": "C:\\Users\\Никита\\Desktop\\Лабы\\3 семестр\\Курсач\\coursework_Danya\\TicketBookingSystem.csproj",
       "projectName": "TicketBookingSystem",
-      "projectPath": "c:\\Users\\Никита\\Desktop\\Лабы\\3 семестр\\Курсач\\qwerty\\coursework_danya\\TicketBookingSystem.csproj",
+      "projectPath": "C:\\Users\\Никита\\Desktop\\Лабы\\3 семестр\\Курсач\\coursework_Danya\\TicketBookingSystem.csproj",
       "packagesPath": "C:\\Users\\Никита\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\Никита\\Desktop\\Лабы\\3 семестр\\Курсач\\qwerty\\coursework_danya\\obj\\",
+      "outputPath": "C:\\Users\\Никита\\Desktop\\Лабы\\3 семестр\\Курсач\\coursework_Danya\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Никита\\AppData\\Roaming\\NuGet\\NuGet.Config",

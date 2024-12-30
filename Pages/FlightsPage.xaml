@@ -26,15 +26,12 @@
                 <DataGridTextColumn Header="Куда" Binding="{Binding ArrivalCity}"/>
                 <DataGridTextColumn Header="Отправление" Binding="{Binding DepartureTime, StringFormat={}{0:dd.MM.yyyy HH:mm}}"/>
                 <DataGridTextColumn Header="Прибытие" Binding="{Binding ArrivalTime, StringFormat={}{0:dd.MM.yyyy HH:mm}}"/>
-                <DataGridTextColumn Header="Базовая цена" Binding="{Binding BasePrice, StringFormat=C}"/>
+                <DataGridTextColumn Header="Базовая цена" Binding="{Binding BasePrice, StringFormat={}{0:N2} ₽}"/>
                 <DataGridTextColumn Header="Свободных мест" Binding="{Binding AvailableSeats}"/>
                 <DataGridTemplateColumn Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Button Content="Редактировать" Click="btnEdit_Click" Margin="0,0,5,0"/>
-                                <Button Content="Удалить" Click="btnDelete_Click"/>
-                            </StackPanel>
+                            <Button Content="Редактировать" Click="btnEdit_Click"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

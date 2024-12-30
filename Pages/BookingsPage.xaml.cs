@@ -106,8 +106,8 @@ namespace TicketBookingSystem.Pages
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
-            var booking = dgBookings.SelectedItem as Booking;
-            if (booking == null)
+            var selectedBooking = dgBookings.SelectedItem as Booking;
+            if (selectedBooking == null)
             {
                 MessageBox.Show("Выберите бронирование для отмены",
                     "Предупреждение",
@@ -125,15 +125,39 @@ namespace TicketBookingSystem.Pages
             {
                 try
                 {
-                    // Возвращаем места в рейс
-                    var flight = booking.Flight;
-                    flight.AvailableSeats += booking.NumberOfSeats;
+                    using (var newContext = new ApplicationDbContext())
+                    {
+                        // Получаем актуальные данные из базы
+                        var booking = newContext.Bookings
+                            .Include(b => b.Flight)
+                            .First(b => b.Id == selectedBooking.Id);
 
-                    // Отмечаем бронирование как отмененное
-                    booking.Status = "Отменено";
+                        // Получаем актуальные данные о рейсе
+                        var flight = newContext.Flights.First(f => f.Id == booking.FlightId);
 
-                    _context.SaveChanges();
-                    LoadBookings();
+                        // Возвращаем места в рейс
+                        flight.AvailableSeats += booking.NumberOfSeats;
+
+                        // Отмечаем бронирование как отмененное
+                        booking.Status = "Отменен";
+
+                        // Явно говорим EF, что эти сущности изменились
+                        newContext.Entry(booking).State = EntityState.Modified;
+                        newContext.Entry(flight).State = EntityState.Modified;
+
+                        newContext.SaveChanges();
+
+                        var messageResult = MessageBox.Show("Бронирование успешно отменено",
+                            "Информация",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+
+                        // Обновляем данные в интерфейсе только после закрытия окна сообщения
+                        if (messageResult == MessageBoxResult.OK)
+                        {
+                            LoadBookings();
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {

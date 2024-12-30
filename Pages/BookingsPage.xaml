@@ -56,7 +56,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Мест" Binding="{Binding NumberOfSeats}" Width="Auto"/>
-                <DataGridTextColumn Header="Сумма" Binding="{Binding TotalPrice, StringFormat=C}" Width="Auto"/>
+                <DataGridTextColumn Header="Сумма" Binding="{Binding TotalPrice, StringFormat={}{0:N2} ₽}" Width="Auto"/>
                 <DataGridTextColumn Header="Дата" Binding="{Binding BookingDate, StringFormat=dd.MM.yyyy HH:mm}" Width="Auto"/>
                 <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="Auto"/>
                 <DataGridTemplateColumn Width="Auto">

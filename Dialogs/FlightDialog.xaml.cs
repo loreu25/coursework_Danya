@@ -69,7 +69,7 @@ namespace TicketBookingSystem.Dialogs
                     if (needToChangeType)
                     {
                         // Получаем количество забронированных мест перед созданием нового объекта
-                        int currentBookedSeats = _existingFlight.TotalSeats - _existingFlight.AvailableSeats;
+                        int bookedSeatsCount = _existingFlight.TotalSeats - _existingFlight.AvailableSeats;
                         int updatedTotalSeats = int.Parse(txtTotalSeats.Text);
 
                         // Создаем новый объект нужного типа с инициализацией всех обязательных полей
@@ -81,7 +81,7 @@ namespace TicketBookingSystem.Dialogs
                                 ArrivalCity = txtArrivalCity.Text,
                                 FlightType = selectedType,
                                 TotalSeats = updatedTotalSeats,
-                                AvailableSeats = updatedTotalSeats - currentBookedSeats,
+                                AvailableSeats = updatedTotalSeats - bookedSeatsCount,
                                 BasePrice = decimal.Parse(txtBasePrice.Text),
                                 Id = _existingFlight.Id
                             }
@@ -92,7 +92,7 @@ namespace TicketBookingSystem.Dialogs
                                 ArrivalCity = txtArrivalCity.Text,
                                 FlightType = selectedType,
                                 TotalSeats = updatedTotalSeats,
-                                AvailableSeats = updatedTotalSeats - currentBookedSeats,
+                                AvailableSeats = updatedTotalSeats - bookedSeatsCount,
                                 BasePrice = decimal.Parse(txtBasePrice.Text),
                                 Id = _existingFlight.Id
                             };
@@ -127,9 +127,15 @@ namespace TicketBookingSystem.Dialogs
 
                     // Обновляем количество мест с учетом уже существующих бронирований
                     int newTotalSeats = int.Parse(txtTotalSeats.Text);
-                    int bookedSeats = Flight.TotalSeats - Flight.AvailableSeats;
+                    int currentBookedSeats = _context.Bookings
+                        .Where(b => b.FlightId == Flight.Id && b.Status != "Отменен")
+                        .Sum(b => b.NumberOfSeats);
+
                     Flight.TotalSeats = newTotalSeats;
-                    Flight.AvailableSeats = newTotalSeats - bookedSeats;
+                    Flight.AvailableSeats = newTotalSeats - currentBookedSeats;
+
+                    // Явно помечаем объект как измененный
+                    _context.Entry(Flight).State = EntityState.Modified;
                 }
                 else
                 {

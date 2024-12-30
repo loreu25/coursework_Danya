@@ -56,7 +56,7 @@ namespace TicketBookingSystem.Dialogs
                 txtDepartureTime.Text = _selectedFlight.DepartureTime.ToString("g");
                 txtArrivalTime.Text = _selectedFlight.ArrivalTime.ToString("g");
                 txtFlightType.Text = _selectedFlight.FlightType;
-                txtBasePrice.Text = _selectedFlight.BasePrice.ToString("C");
+                txtBasePrice.Text = $"{_selectedFlight.BasePrice:N2} ₽";
                 txtAvailableSeats.Text = _selectedFlight.AvailableSeats.ToString();
 
                 // Обновляем общую стоимость
@@ -83,7 +83,7 @@ namespace TicketBookingSystem.Dialogs
             if (_selectedFlight != null && int.TryParse(txtNumberOfSeats.Text, out int numberOfSeats))
             {
                 decimal totalPrice = _selectedFlight.CalculatePrice() * numberOfSeats;
-                txtTotalPrice.Text = totalPrice.ToString("C");
+                txtTotalPrice.Text = $"{totalPrice:N2} ₽";
             }
             else
             {
